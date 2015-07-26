@@ -63,4 +63,31 @@ public class CreateLogicBlockMenu extends JPopupMenu {
             this.add(menuItem);
         }
     }
+
+    private static class CreateListener implements ActionListener {
+
+        private LogicSimPanel panel;
+
+        public CreateListener(LogicSimPanel panel, Point2D.Double position) {
+            this.panel = panel;
+            this.position = position;
+        }
+
+        private Point2D.Double position;
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            LogicBlock lb = null;
+            switch (((JMenuItem) e.getSource()).getText()) {
+                case "AND Gate":
+                    lb = new AndGate(this.position);
+                    break;
+                case "OR Gate":
+                    lb = new OrGate(this.position);
+                    break;
+            }
+            panel.getModule().addBlock(lb);
+            panel.repaint();
+        }
+    }
 }

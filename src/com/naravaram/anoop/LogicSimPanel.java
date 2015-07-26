@@ -12,11 +12,11 @@ import java.awt.geom.Point2D;
 /**
  * Created by anoop on 7/15/15.
  */
-public class LogicSimPanel extends JPanel {
+public class LogicSimPanel extends JPanel implements MouseListener, MouseMotionListener {
 
-    private LogicModule module;
+    private final LogicModule module;
 
-    private CreateLogicBlockMenu createMenu;
+    private final CreateLogicBlockMenu createMenu;
 
     private LogicBlock draggingBlock;
 
@@ -27,56 +27,7 @@ public class LogicSimPanel extends JPanel {
 
         this.createMenu = new CreateLogicBlockMenu(this);
 
-        this.addMouseListener(new MouseListener() {
-
-            @Override
-            public void mousePressed(MouseEvent e) {
-
-                // figure out which block was clicked, if any
-                LogicBlock clickedBlock = null;
-                for (LogicBlock block : module.getBlocks()) {
-                    if (block.getBounds().contains(e.getPoint())) {
-                        clickedBlock = block;
-                        break;
-                    }
-                }
-
-                LogicSimPanel.this.draggingBlock = clickedBlock;
-
-                maybeShowPopupMenu(e);
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                LogicSimPanel.this.draggingBlock = null;
-
-                maybeShowPopupMenu(e);
-            }
-
-            @Override public void mouseClicked(MouseEvent e) {}
-            @Override public void mouseEntered(MouseEvent e) {}
-            @Override public void mouseExited(MouseEvent e) {}
-
-            public void maybeShowPopupMenu(MouseEvent e) {
-                if (e.isPopupTrigger()) {
-                    LogicSimPanel.this.createMenu.show(e.getComponent(), e.getX(), e.getY());
-                    LogicSimPanel.this.createMenu.setPosition(new Point2D.Double(e.getX(), e.getY()));
-                }
-            }
-        });
-
-        this.addMouseMotionListener(new MouseMotionListener() {
-            @Override
-            public void mouseDragged(MouseEvent e) {
-                LogicSimPanel.this.draggingBlock.setPosition(new Point2D.Double(e.getX(), e.getY()));
-                LogicSimPanel.this.repaint();
-            }
-
-            @Override
-            public void mouseMoved(MouseEvent e) {
-
-            }
-        });
+        this.addMouseListener(this);
     }
 
     @Override
@@ -93,5 +44,48 @@ public class LogicSimPanel extends JPanel {
         return module;
     }
 
+    /* MouseListener methods */
 
+    @Override
+    public void mousePressed(MouseEvent e) {
+
+        // figure out which block was clicked, if any
+        this.draggingBlock = null;
+        for (LogicBlock block : module.getBlocks()) {
+            if (block.getBounds().contains(e.getPoint())) {
+                this.draggingBlock = block;
+                break;
+            }
+        }
+
+        maybeShowPopupMenu(e);
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+        this.draggingBlock = null;
+        maybeShowPopupMenu(e);
+    }
+
+    @Override public void mouseClicked(MouseEvent e) {}
+    @Override public void mouseEntered(MouseEvent e) {}
+    @Override public void mouseExited(MouseEvent e) {}
+
+    private void maybeShowPopupMenu(MouseEvent e) {
+        if (e.isPopupTrigger()) {
+            this.createMenu.show(e.getComponent(), e.getX(), e.getY());
+        }
+    }
+
+    /* MouseMotionListener methods */
+
+    @Override
+    public void mouseDragged(MouseEvent e) {
+        if (this.draggingBlock != null) {
+            this.draggingBlock.setPosition(new Point2D.Double(e.getX(), e.getY()));
+            this.repaint();
+        }
+    }
+
+    @Override public void mouseMoved(MouseEvent e) {}
 }
